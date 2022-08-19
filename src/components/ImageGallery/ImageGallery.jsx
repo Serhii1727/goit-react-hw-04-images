@@ -17,6 +17,7 @@ export class ImageGallery extends Component {
         status: 'idle',
         page: 1,
         currentImage: '',
+        modal: false,
     }
 
     componentDidUpdate(prevProps, prevState) {
@@ -53,7 +54,7 @@ export class ImageGallery extends Component {
     }
 
     clikImage = (image) => {
-        this.setState({ currentImage: image, status: 'modal' })
+        this.setState({ currentImage: image, modal: true, })
     }
 
     loadMore = () => {
@@ -62,12 +63,17 @@ export class ImageGallery extends Component {
         }))
     }
 
+    closeModal = () => {
+        this.setState({ modal: false })
+    }
+
     render() {
 
-        const { arrayImage, status, } = this.state;
+        const { arrayImage, status, modal } = this.state;
 
-        if (status === 'modal') {
+        if (modal) {
             return <Modal
+                closeModal={this.closeModal}
                 largeImageURL={this.state.currentImage} />
         }
         if (status === 'idle') {
