@@ -38,10 +38,19 @@ export class ImageGallery extends Component {
                     }
                     else {
                         this.setState({ status: "resolved", })
-                        this.setState(prevState => ({
-                            arrayImage: [...prevState.arrayImage, ...hits]
-                        }))
+                        return hits;
                     }
+                })
+                .then(hits => {
+                    let newArrayImage = [];
+                    hits.map(({ id, webformatURL, largeImageURL }) => {
+
+                        return newArrayImage.push({ id, webformatURL, largeImageURL })
+                    })
+
+                    this.setState(({ arrayImage }) => ({
+                        arrayImage: [...arrayImage, ...newArrayImage]
+                    }))
                 })
         }
         if (prevState.arrayImage !== this.state.arrayImage && this.state.page !== 1) {

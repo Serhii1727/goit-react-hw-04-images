@@ -21,7 +21,7 @@ export class Modal extends Component {
     }
 
     handelKeyDown = (e) => {
-        if (e.code === 'Esk') {
+        if (e.code === 'Escape') {
             this.props.closeModal()
         }
     }
