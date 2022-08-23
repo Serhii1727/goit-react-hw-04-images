@@ -6,7 +6,6 @@ import ImageGallery from "./ImageGallery";
 import Modal from './Modal';
 import Button from './Button';
 import { Loader } from './Loader/Loader';
-import { Title } from './App.styled'
 import { KEY } from './api/api.js'
 
 
@@ -74,7 +73,6 @@ export class App extends Component {
 
     return (< div >
       <Searchbar onSubmit={this.handleNameSubmit} />
-      <Title>Введите запрос в поисковую строку</Title>
       {status === 'pending' && <Loader />}
       {arrayImage.length > 0 &&
         <>
