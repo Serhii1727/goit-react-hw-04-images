@@ -73,10 +73,10 @@ export class App extends Component {
 
     return (< div >
       <Searchbar onSubmit={this.handleNameSubmit} />
-      {status === 'pending' && <Loader />}
       {arrayImage.length > 0 &&
         <>
           <ImageGallery arrayImage={arrayImage} onClickImage={this.clikImage} />
+          {status === 'pending' && <Loader />}
           <Button onLoadMore={this.clickLoadMore} />
         </>}
       {modal === true && <Modal currentImage={currentImage} onClose={this.closeModal} />}
