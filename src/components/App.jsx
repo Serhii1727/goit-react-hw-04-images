@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Searchbar from "./Searchbar";
@@ -6,80 +6,68 @@ import ImageGallery from "./ImageGallery";
 import Modal from './Modal';
 import Button from './Button';
 import { Loader } from './Loader/Loader';
-import { KEY } from './api/api.js'
+import { KEY, fetchApi } from './api/api.js'
 
+export const App = () => {
+  const [name, setName] = useState('');
+  const [arrayImage, setArrayImage] = useState([]);
+  const [page, setPage] = useState(1);
+  const [loader, setLoader] = useState(false);
+  const [modal, setModal] = useState(false);
+  const [currentImage, setCurrentImage] = useState('');
 
-export class App extends Component {
-  state = {
-    name: '',
-    arrayImage: [],
-    page: 1,
-    status: 'idle',
-    modal: false,
-    currentImage: '',
-
-  }
-
-  componentDidUpdate(prevProps, prevState) {
-    if (prevState.name !== this.state.name || prevState.page !== this.state.page) {
-      this.setState({ status: 'pending', arrayImage: [] })
-      fetch(`https://pixabay.com/api/?q=${this.state.name}&page=1&key=${KEY}&image_type=photo&orientation=horizontal&page=${this.state.page}&per_page=12`)
-        .then(res => res.json())
-        .then(({ hits }) => {
-          if (hits.length === 0) {
-            this.setState({ status: 'rejected' })
-          } else {
-            this.setState(({ arrayImage }) => ({
-              arrayImage: [...arrayImage, ...hits.map(({ id, tags, webformatURL, largeImageURL }) => { return { id, tags, webformatURL, largeImageURL } })]
-            }))
-          }
-        }).finally(() => {
-          this.setState({ status: 'idle' });
-        })
-
+  useEffect(() => {
+    if (name.trim() === '') {
+      return;
     }
-    if (prevState.arrayImage !== this.state.arrayImage && this.state.page !== 1) {
-      window.scrollTo({
-        left: 0,
-        top: document.body.scrollHeight,
-        behavior: 'smooth',
-      });
-    }
+    setLoader(true)
+    fetchApi(name, KEY, page)
+      .then(res => res.json())
+      .then(({ hits }) => {
+        if (hits.length === 0) {
+          return
+        } else {
+          setArrayImage(arrayImage => ([...arrayImage, ...hits.map(({ id, tags, webformatURL, largeImageURL }) => { return { id, tags, webformatURL, largeImageURL } })]
+          ))
+          setLoader(false)
+        }
+      })
+  }, [name, page])
+
+  useEffect(() => {
+    setPage(1);
+    setArrayImage([])
+  }, [name])
+
+  const handleNameSubmit = (name) => {
+    setName(name)
   }
 
-  handleNameSubmit = (name) => {
-    this.setState({ name })
+  const clickLoadMore = () => {
+    setPage(page => page + 1)
   }
 
-  clickLoadMore = () => {
-    this.setState(prevState => ({
-      page: prevState.page + 1,
-    }))
+  const clikImage = (image) => {
+    setCurrentImage(image)
+    setModal(true)
   }
 
-  clikImage = (image) => {
-    this.setState({ currentImage: image, modal: true, })
+  const closeModal = () => {
+    setModal(false)
   }
 
-  closeModal = () => {
-    this.setState({ modal: false })
-  }
-
-  render() {
-    const { arrayImage, status, modal, currentImage } = this.state
-
-    return (< div >
-      <Searchbar onSubmit={this.handleNameSubmit} />
+  return (
+    <div>
+      <Searchbar onSubmit={handleNameSubmit} />
       {arrayImage.length > 0 &&
         <>
-          <ImageGallery arrayImage={arrayImage} onClickImage={this.clikImage} />
-          {status === 'pending' && <Loader />}
-          <Button onLoadMore={this.clickLoadMore} />
-        </>}
-      {modal === true && <Modal currentImage={currentImage} onClose={this.closeModal} />}
+          <ImageGallery arrayImage={arrayImage} onClickImage={clikImage} />
+          {loader && <Loader />}
+          <Button onLoadMore={clickLoadMore} />
+        </>
+      }
+      {modal && <Modal currentImage={currentImage} onClose={closeModal} />}
       <ToastContainer autoClose={3000} />
     </div>)
 
-  }
-
-};
+}
