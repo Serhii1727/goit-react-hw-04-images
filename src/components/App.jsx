@@ -32,7 +32,6 @@ export const App = () => {
           setLoader(false)
         }
       })
-
   }, [name, page])
 
   const handleNameSubmit = (name) => {
