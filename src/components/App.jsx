@@ -34,13 +34,11 @@ export const App = () => {
       })
   }, [name, page])
 
-  useEffect(() => {
-    setPage(1);
-    setArrayImage([])
-  }, [name])
 
   const handleNameSubmit = (name) => {
     setName(name)
+    setPage(1)
+    setArrayImage([])
   }
 
   const clickLoadMore = () => {
